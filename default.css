@@ -1,0 +1,141 @@
+html, body {
+    font-family: "Inter var", sans-serif;
+    font-weight: 400;
+    color: #ffffff;
+    background-color: #052235;
+}
+div.tab {
+    margin-left: 20%;
+    margin-top: 100px;
+    margin-right: 20%;
+    margin-bottom: auto;
+    padding: 30px;
+    text-align: center;
+    background-color: rgb(0, 21, 34);
+    border-radius: 20px;
+}
+
+h1, h2, h3 {
+    font-weight: 400;
+}
+
+div.instructions {
+    color: rgb(158, 164, 182);
+    display: block;
+    margin: auto auto 8px auto;
+    width: 80%;
+}
+
+.status {
+    font-style: italic;
+}
+
+form {
+    display: grid;
+    grid-template-columns: 50% auto;
+    grid-column-gap: 5px;
+    width: 60%;
+    min-width:300px;
+    max-width:600px;
+    margin: 0 auto;
+}
+
+label {
+    display: inline-grid;
+    text-align: right;
+    align-self: center;
+}
+
+input, select {
+    margin: 5px;
+	border: none;
+	padding: 5px;
+	font: inherit;
+	outline: inherit;
+    border-radius: 10px;
+    outline: currentcolor none medium;
+    background-color:rgba(21, 61, 111, 0.44);
+    color: #ffffff;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+input:invalid+span:after {
+    content: '✖';
+    padding-left: 5px;
+  }
+  
+  input:valid+span:after {
+    content: '✓';
+    padding-left: 5px;
+  }
+
+button {
+    margin: 5px;
+	border: none;
+	padding: 10px 18px 10px 18px;
+	font: inherit;
+	outline: inherit;
+    border-radius: 20px;
+    outline: currentcolor none medium;
+    background-color:rgba(21, 61, 111, 0.44);
+    color: #ffffff;
+}
+
+button:hover {
+    background-color: rgba(21, 61, 111, .88);
+    cursor: pointer;
+}
+
+button:disabled {
+    background-color:rgba(21, 61, 111, 0.22);
+    color:rgb(109, 168, 255);
+}
+
+button.sectionButton,
+button.subsectionButton {
+    background-color: transparent;
+    font-size: x-large;
+    color: #aaaaaa;
+}
+
+button.subsectionButton {
+    font-size: larger;
+}
+
+button.sectionButton:hover,
+button.subsectionButton:hover {
+    background-color: transparent;
+    color: #ffffff;
+}
+
+button.sectionButton.activeSection,
+button.subsectionButton.activeSection {
+    color: #ffffff;
+}
+
+
+button.majorButton {
+    background-image: linear-gradient(137.27deg, rgb(177, 255, 191, .75) 3.65%, rgb(255, 241, 109, .75) 100%);
+    color: rgb(0, 21, 34);
+}
+
+button.majorButton:hover {
+    background-image: linear-gradient(137.27deg, rgb(177, 255, 191) 3.65%, rgb(255, 241, 109) 100%);
+    color: rgb(0, 21, 34);
+}
+
+button.majorButton:disabled {
+    background-image: linear-gradient(137.27deg, rgb(177, 255, 191, .5) 3.65%, rgb(255, 241, 109, .5) 100%);
+    color: #000000;
+}
