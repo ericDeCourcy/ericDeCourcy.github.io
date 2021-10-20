@@ -28,17 +28,7 @@
 			<br/>Note that you will need to approve the LP token if you plan to withdraw, as this gives the swap contract the ability to burn your LP tokens.
 		</div>
 		<div id="tokenApprovalButtons">
-			<button id="approveDaiButton" onclick="approveDai(this)">Approve Fake-DAI</button>
-			<span id="approveDaiStatus" class="status"></span>
-			<br/>
-			<button id="approveUsdcButton" onclick="approveUsdc(this)">Approve Fake-USDC</button>
-			<span id="approveUsdcStatus" class="status"></span>
-			<br/>
-			<button id="approveUsdtButton" onclick="approveUsdt(this)">Approve Fake-USDT</button>
-			<span id="approveUsdtStatus" class="status"></span>
-			<br/>
-			<button id="approveLPButton" onclick="approveLP(this)">Approve LP Tokens</button>
-			<span id="approveLPStatus" class="status"></span>
+			<!--- token approval buttons dynamically generated -->
 		</div>
 		<button id="continueButton" class="majorButton" onclick="continueToActionsTab()">Skip / Continue</button>
 	</div>
@@ -62,13 +52,8 @@
 			<div class="instructions">
 				Input amounts and then click Deposit. Make sure your tokens are approved!
 			</div>
-			<form>
-				<label for="DaiToDeposit">Fake-DAI To Deposit:</label>
-				<input type="number" id="DaiToDeposit" name="DaiToDeposit" min="0" value="0">
-				<label for="UsdcToDeposit">Fake-USDC To Deposit:</label>
-				<input type="number" id="UsdcToDeposit" name="UsdcToDeposit" min="0" value="0">
-				<label for="UsdtToDeposit">Fake-USDT To Deposit:</label>
-				<input type="number" id="UsdtToDeposit" name="UsdtToDeposit" min="0" value="0">
+			<form id="depositForm">
+				<!-- pool token inputs dynamically generated -->
 			</form>
 			<button id="depositButton" class="majorButton" onclick="deposit(this)">Deposit</button>	
 			<div id="depositStatus" class="status">Deposit not initiated.</div>
@@ -78,21 +63,10 @@
 			<div class="instructions">
 				Pick what token to input and what token you'd like to recieve. Then, pick how many of the input token you'd like to send in.
 			</div>
-			<form>
+			<form id="swapForm">
 				<label for="swapAmountIn">Tokens in for swap:</label>
 				<input type="number" id="swapAmountIn" name="swapAmountIn" min="0" value="0">
-				<label for="swapTokenIndexIn">Token for swap Input:</label>
-				<select id="swapTokenIndexIn" name="swapTokenIndexIn">
-					<option value=0>Fake-DAI</option>
-					<option value=1>Fake-USDC</option>
-					<option value=2>Fake-USDT</option>
-				</select>
-				<label for="swapTokenIndexOut">Token for swap Output:</label>
-				<select id="swapTokenIndexOut" name="swapTokenIndexOut">
-					<option value=0 selected>Fake-DAI</option>
-					<option value=1>Fake-USDC</option>
-					<option value=2>Fake-USDT</option>
-				</select>
+				<!-- input and output token options dynamically generated -->
 			</form>
 			<button id="swapButton" class="majorButton" onclick="swap(this)">Swap</button>
 			<div id="swapStatus" class="status">Swap not initiated.</div>
@@ -123,13 +97,8 @@
 					This will give the "desired" amounts of each tokens, burning the appropriate number of LP tokens. Keep in mind that this may burn up to all of your LP tokens.
 					<br/>Make sure your LP tokens are approved!
 				</div>
-				<form>
-					<label for="imbalancedDAIOut">DAI desired:</label>
-					<input type="number" id="imbalancedDAIOut" name="imbalancedDAIOut" min="0" value="0">
-					<label for="imbalancedUSDCOut">USDC desired:</label>
-					<input type="number" id="imbalancedUSDCOut" name="imbalancedUSDCOut" min="0" value="0">
-					<label for="imbalancedUSDTOut">USDT desired:</label>
-					<input type="number" id="imbalancedUSDTOut" name="imbalancedUSDTOut" min="0" value="0">
+				<form id="imbalancedWithdrawalForm">
+					<!-- pool token inputs dynamically generated -->
 				</form>
 				<button id="withdrawImbalancedButton" class="majorButton" onclick="withdrawImbalanced(this)">Withdraw Imbalanced</button>
 				<div id="withdrawImbalancedStatus" class="status">Imbalanced Withdrawal not initiated.</div>
@@ -139,13 +108,8 @@
 				<div class="instructions">
 					This will burn a specified amount of LP tokens and withdraw all funds in the form of a single token.
 				</div>
-				<form>
-					<label for="singleTokenIndex">Withdrawal Token:</label>
-					<select id="singleTokenIndex" name="singleTokenIndex">
-						<option value=0 selected>Fake-DAI</option>
-						<option value=1>Fake-USDC</option>
-						<option value=2>Fake-USDT</option>
-					</select>
+				<form id="singleWithdrawalForm">
+					<!-- withdrawal token options dynamically generated -->
 					<label for="singleTokenAmount">Amount Of LP Token To Withdraw:</label>
 					<input type="number" id="singleTokenAmount" name="singleTokenAmount" min="0" value="0">
 				</form>
@@ -162,7 +126,8 @@
 			<div id="getRewardsStatus" class="status">Claim Rewards not initiated.</div>
 		</div>
 	</div>
-	
-<script src="main.js"></script>
+<script src="./tokens.js"></script>
+<script src="./pools.js"></script>
+<script src="./main.js"></script>
 </body>	
 
