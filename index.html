@@ -65,10 +65,11 @@
 			</div>
 			<form id="swapForm">
 				<label for="swapAmountIn">Tokens in for swap:</label>
-				<input type="number" id="swapAmountIn" name="swapAmountIn" min="0" value="0">
+				<input type="number" id="swapAmountIn" oninput="calculateSwap(value)" name="swapAmountIn" min="0" value="0">
 				<!-- input and output token options dynamically generated -->
 			</form>
 			<button id="swapButton" class="majorButton" onclick="swap(this)">Swap</button>
+			<div id="swapEstimate" class="status">No swap estimate</div>
 			<div id="swapStatus" class="status">Swap not initiated.</div>
 		</div>
 

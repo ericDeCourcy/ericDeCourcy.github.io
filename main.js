@@ -1,5 +1,5 @@
-/* global tokens, fakePool */
-const activePool = fakePool;
+/* global tokens, fakePool, usd1Pool */
+const activePool = usd1Pool;
 
 // accounts (for metamask)
 let accounts = [];
@@ -33,6 +33,12 @@ function selectSection(sectionNumber) {
     element.classList.remove('activeSection');
   })
   actionSectionTitles[sectionNumber].classList.add('activeSection');
+
+  if (sectionNumber === 2) { 
+    getLPBalance();
+    isTokenAllowed();
+  }
+
 }
 
 const withdrawalSubsectionTitles = [
@@ -116,7 +122,7 @@ async function connectToMetamask(button) {
     }
     accounts = await ethereum.request({ method: 'eth_requestAccounts' });
     showSuccess(statusElement, loggingKeyword);
-    continueToApprovalTab();
+    await continueToApprovalTab();
   } catch (error) {
     showError(statusElement, loggingKeyword, error);
   } finally {
@@ -124,12 +130,18 @@ async function connectToMetamask(button) {
   }
 }
 
-function continueToApprovalTab() {
+async function continueToApprovalTab() {
   tabs.connection.hidden = true;
   tabs.approval.hidden = false;
   tabs.actions.hidden = true;
   const tokenApprovalButtons = document.getElementById('tokenApprovalButtons');
-  tokenApprovalButtons.innerHTML = activePool.getTokenApprovalHTML();
+  tokenApprovalButtons.innerHTML = 'Loading token approval data...';
+  const tokenApprovalHTML = await activePool.getTokenApprovalHTML();
+  if (tokenApprovalHTML == null) {
+    continueToActionsTab();
+  } else {
+    tokenApprovalButtons.innerHTML = tokenApprovalHTML;
+  }
 }
 
 //TODO alanna simplify this function
@@ -212,6 +224,8 @@ async function deposit(button) {
 
 
 async function getLPBalance() {
+    console.log("Getting LP Balance...");
+
     // construct tx params
     let funcSig = '0x70a08231';
 
@@ -227,8 +241,9 @@ async function getLPBalance() {
       }]
     }); 
     
-    document.getElementById('LPTokenBalance').innerHTML = 
-      'Your LP Token balance: ' + (parseInt(LPBalance,16) / 1e+18);
+    const tokenBalanceString = `Your LP Token balance: ${parseInt(LPBalance, 16) / 1e+18}`;
+    document.getElementById('LPTokenBalance').innerHTML = tokenBalanceString;
+    console.log(tokenBalanceString);
 }
 
 
@@ -261,6 +276,48 @@ async function swap(button) {
   button.disabled = false;
 }
 
+
+async function calculateSwap(value) {
+  const swapTokenIndexIn = document.getElementById('swapTokenIndexIn');
+  const swapTokenIndexOut = document.getElementById('swapTokenIndexOut');
+  const swapEstimateElement = document.getElementById('swapEstimate');
+  swapEstimateElement.innerHTML = `Estimating swap outcome...`;
+
+  let tokenIndexIn = swapTokenIndexIn.value;
+  let tokenIndexOut = swapTokenIndexOut.value;
+
+  let swapAmountScaled = value * activePool.poolTokens[tokenIndexIn].decimals;
+  
+  const transactionData = 
+    '0xa95b089f'    // calculate swap sighash
+    + getPaddedHex(tokenIndexIn) 
+    + getPaddedHex(tokenIndexOut) 
+    + getPaddedHex(swapAmountScaled);
+
+  console.log("got to before the try in calc swap");
+  console.log("transactionData = " + transactionData);
+
+  try {
+    let swapEstimateOutput = await ethereum.request({
+      method: 'eth_call',
+      params:  [{
+        to: activePool.address,
+        data: transactionData  
+      }]
+    }); 
+    console.log(`Raw swap estimate: ${swapEstimateOutput}.`);  // TODO: add to debug toggle
+    
+    const swapEstimateOutputDescaled = parseInt(swapEstimateOutput) / activePool.poolTokens[tokenIndexOut].decimals;  // TODO: will this impart inaccuracies?
+    const roundedSwapEstimate = Math.round(swapEstimateOutputDescaled * 100) / 100;
+
+    swapEstimateElement.innerHTML = `Estimated swap outcome: ${roundedSwapEstimate} ${activePool.poolTokens[tokenIndexOut].name}`;
+
+  } catch (error) {
+    console.log(`Error retreiving swap estimate: ${error.code} ${error.message}`);
+  }
+
+  
+}
 
 async function withdrawBalanced(button) {
   button.disabled = true;

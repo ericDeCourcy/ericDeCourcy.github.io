@@ -8,20 +8,52 @@ class Pool {
         this.LPToken = LPToken;
     }
 
-    getTokenApprovalHTML() {
+    async getTokenApprovalHTML() {
         let buttonsHTML = '';
+        let allTokensAreApproved = true;
+
+        const tokenAllowanceTransactionData =
+            '0xdd62ed3e'
+            + ''.padStart(24, '0')
+            + ethereum.selectedAddress.slice(2,)
+            + ''.padStart(24, '0')
+            + activePool.address.replace(/^0x/, '');
 
         const allTokens = JSON.parse(JSON.stringify(this.poolTokens));
         allTokens.push(this.LPToken);
-        allTokens.forEach(token => {
+        for (const token of allTokens) {
+            let disabled = '';
+            let status = '';
+            try {
+                const allowance = await ethereum.request({
+                    method: 'eth_call',
+                    params: [{
+                        to: token.address,
+                        data: tokenAllowanceTransactionData
+                    }]
+                });
+                if (allowance != 0) {
+                    disabled = 'disabled';
+                    status = 'Token already approved.';
+                } else {
+                    allTokensAreApproved = false;
+                }
+            } catch(error) {
+                console.log(error);
+                allTokensAreApproved = false;
+            }
             buttonsHTML += `<button id="approve${token.name}Button" 
-                onclick="approveToken(this, ${token.id})">
+                onclick="approveToken(this, ${token.id})" ${disabled}>
                     Approve ${token.name}
                 </button>
-                <span id="approve${token.name}Status" class="status"></span>
+                <span id="approve${token.name}Status" class="status">${status}</span>
                 <br/>`;
-        });
-        return buttonsHTML;
+        }
+        if (allTokensAreApproved) {
+            return null;
+        } else {
+            return buttonsHTML;
+        }
     }
 
     getSelectTokenHTML(labelText, elementName) {
@@ -78,10 +110,8 @@ class Pool {
     }
 }
 
-const fakePool = new Pool(
-    // TODO eric verify this is the pool address. called 'fake swap address' in main.
+const usd1Pool = new Pool(
     '0x3E192A2Eae22B3DB07a0039E10bCe29097E881B9', // swap pool address
-    // TODO eric verify this is the rewards contract address.
     '0xFc99135BAEa5D21267b2c26E3d8518aaf07f2644', // rewards contact
     [tokens[0], tokens[1], tokens[2]],
     tokens[3]
