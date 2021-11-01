@@ -36,7 +36,6 @@ function selectSection(sectionNumber) {
 
   if (sectionNumber === 2) { 
     getLPBalance();
-    isTokenAllowed();
   }
 
 }
@@ -97,6 +96,12 @@ function showError(statusElement, loggingKeyword, error) {
   statusElement.innerHTML = `${loggingKeyword} failed. See console log for details.`;
 }
 
+function showConnectionTab() {
+  tabs.connection.hidden = false;
+  tabs.approval.hidden = true;
+  tabs.actions.hidden = true;
+}
+
 
 async function ethRequest(params, statusElement, loggingKeyword) {
   try {
@@ -122,7 +127,7 @@ async function connectToMetamask(button) {
     }
     accounts = await ethereum.request({ method: 'eth_requestAccounts' });
     showSuccess(statusElement, loggingKeyword);
-    await continueToApprovalTab();
+    await showApprovalTab();
   } catch (error) {
     showError(statusElement, loggingKeyword, error);
   } finally {
@@ -130,7 +135,7 @@ async function connectToMetamask(button) {
   }
 }
 
-async function continueToApprovalTab() {
+async function showApprovalTab() {
   tabs.connection.hidden = true;
   tabs.approval.hidden = false;
   tabs.actions.hidden = true;
@@ -138,7 +143,7 @@ async function continueToApprovalTab() {
   tokenApprovalButtons.innerHTML = 'Loading token approval data...';
   const tokenApprovalHTML = await activePool.getTokenApprovalHTML();
   if (tokenApprovalHTML == null) {
-    continueToActionsTab();
+    showActionsTab();
   } else {
     tokenApprovalButtons.innerHTML = tokenApprovalHTML;
   }
@@ -173,31 +178,31 @@ async function approveToken(button, tokenId) {
 }
 
 
-function continueToActionsTab() {
+function showActionsTab() {
   tabs.connection.hidden = true;
   tabs.approval.hidden = true;
   tabs.actions.hidden = false;
   populateActionOptions();
 }
 
-function populateActionOptions() {
-  const swapForm = document.getElementById('swapForm');
-  swapForm.innerHTML += activePool.getSelectTokenHTML(
-    'Token for swap input:', 'swapTokenIndexIn');
-  swapForm.innerHTML += activePool.getSelectTokenHTML(
-    'Token for swap output:', 'swapTokenIndexOut');
-  
-  const singleWithdrawalForm = document.getElementById('singleWithdrawalForm');
-  singleWithdrawalForm.innerHTML = activePool.getSelectTokenHTML(
-    'Withdrawal Token:', 'singleTokenIndex') + singleWithdrawalForm.innerHTML;
-  
-  const depositForm = document.getElementById('depositForm');
-  depositForm.innerHTML = activePool.getInputTokenAmountHTML(
-    'to deposit:', 'ToDeposit');
 
-  const imbalancedWithdrawalForm = document.getElementById('imbalancedWithdrawalForm');
-  imbalancedWithdrawalForm.innerHTML = activePool.getInputTokenAmountHTML(
-    'desired:', 'ImbalancedOut');
+function populateActionOptions() {
+  document.getElementById('swapForm').innerHTML =
+    `<label for="swapAmountIn">Tokens in for swap:</label>`
+    + `<input type="number" id="swapAmountIn" name="swapAmountIn" oninput="calculateSwap(value)" min="0" value="0"/>`
+    + activePool.getSelectTokenHTML('Token for swap input:', 'swapTokenIndexIn')
+    + activePool.getSelectTokenHTML('Token for swap output:', 'swapTokenIndexOut');
+
+  document.getElementById('singleWithdrawalForm').innerHTML =
+    activePool.getSelectTokenHTML('Withdrawal Token:', 'singleTokenIndex')
+    + `<label for="singleTokenAmount">Amount Of LP Token To Withdraw:</label>`
+    + `<input type="number" id="singleTokenAmount" name="singleTokenAmount" min="0" value="0"/>`;
+  
+  document.getElementById('depositForm').innerHTML =
+    activePool.getInputTokenAmountHTML('to deposit:', 'ToDeposit');
+
+  document.getElementById('imbalancedWithdrawalForm').innerHTML =
+    activePool.getInputTokenAmountHTML('desired:', 'ImbalancedOut');
 }
 
 

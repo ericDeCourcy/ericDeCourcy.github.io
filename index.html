@@ -1,9 +1,9 @@
 <!--run this with 'npx http-server -o index.html'-->
 <head>
-	<meta charset="utf-8">
-	<link rel="icon" type="image/png" href="./favicon.png">
+	<meta charset="utf-8"/>
+	<link rel="icon" type="image/png" href="./favicon.png"/>
 	<title>Fuse Stable Swap</title>
-	<link href="./default.css" rel="stylesheet">
+	<link href="./default.css" rel="stylesheet"/>
 </head>
 
 <body>
@@ -17,10 +17,11 @@
 		</div>
 		<br/>
 		<button id="enableEthereumButton" class="majorButton" onclick="connectToMetamask(this)">Connect To MetaMask</button>
-		<div id="transactionStatus" class="status">Metamask not connected</div>
+		<div id="transactionStatus" class="status">Metamask not connected.</div>
 	</div>
 
 	<div id="tokenApproval" class="tab" hidden>
+		<div class="back"><button class="back" onclick="showConnectionTab()">←</button></div>
 		<h1>Approvals</h1>
 		<div class="instructions">
 			Before using StableSwap, you'll need to approve any tokens you plan to transfer in.
@@ -30,18 +31,11 @@
 		<div id="tokenApprovalButtons">
 			<!--- token approval buttons dynamically generated -->
 		</div>
-		<button id="continueButton" class="majorButton" onclick="continueToActionsTab()">Skip / Continue</button>
+		<button id="continueButton" class="majorButton" onclick="showActionsTab()">Skip / Continue</button>
 	</div>
 
 	<div id="actions" class="tab" hidden>
-		<div id="actionInstructions" class="section">
-			<h1>Take Action!</h1>
-			<div class="instructions">
-				Now that you're connected and you've approved tokens, you're ready to take actions.
-				<br/>You can deposit liquidity, swap, or perform 3 different types of liquidity withdrawal.
-			</div>
-		</div>
-
+		<div class="back"><button class="back" onclick="showApprovalTab()">←</button></div>
 		<div id="actionOptions">
 			<button id="depositTitle" class="sectionButton" onclick="selectSection(0)">Deposit</button>
 			<button id="swapTitle" class="sectionButton activeSection" onclick="selectSection(1)">Swap</button>
@@ -64,12 +58,10 @@
 				Pick what token to input and what token you'd like to recieve. Then, pick how many of the input token you'd like to send in.
 			</div>
 			<form id="swapForm">
-				<label for="swapAmountIn">Tokens in for swap:</label>
-				<input type="number" id="swapAmountIn" oninput="calculateSwap(value)" name="swapAmountIn" min="0" value="0">
-				<!-- input and output token options dynamically generated -->
+				<!-- token options dynamically generated -->
 			</form>
 			<button id="swapButton" class="majorButton" onclick="swap(this)">Swap</button>
-			<div id="swapEstimate" class="status">No swap estimate</div>
+			<div id="swapEstimate" class="status">No swap estimate.</div>
 			<div id="swapStatus" class="status">Swap not initiated.</div>
 		</div>
 
@@ -87,7 +79,7 @@
 				<span id="LPTokenBalance">Retreiving LP Token balance...</span>
 				<form>
 					<label for="withdrawAmountInput">LP Tokens To Withdraw:</label>
-					<input type="number" id="withdrawAmountInput" name="withdrawAmountInput" min="0" value="0">
+					<input type="number" id="withdrawAmountInput" name="withdrawAmountInput" min="0" value="0"/>
 				</form>
 				<button id="withdrawBalancedButton" class="majorButton" onclick="withdrawBalanced(this)">Withdraw Balanced</button>
 				<div id="withdrawBalancedStatus" class="status">Balanced Withdrawal not initiated.</div>
@@ -99,7 +91,7 @@
 					<br/>Make sure your LP tokens are approved!
 				</div>
 				<form id="imbalancedWithdrawalForm">
-					<!-- pool token inputs dynamically generated -->
+					<!-- token options dynamically generated -->
 				</form>
 				<button id="withdrawImbalancedButton" class="majorButton" onclick="withdrawImbalanced(this)">Withdraw Imbalanced</button>
 				<div id="withdrawImbalancedStatus" class="status">Imbalanced Withdrawal not initiated.</div>
@@ -110,9 +102,7 @@
 					This will burn a specified amount of LP tokens and withdraw all funds in the form of a single token.
 				</div>
 				<form id="singleWithdrawalForm">
-					<!-- withdrawal token options dynamically generated -->
-					<label for="singleTokenAmount">Amount Of LP Token To Withdraw:</label>
-					<input type="number" id="singleTokenAmount" name="singleTokenAmount" min="0" value="0">
+					<!-- token options dynamically generated -->
 				</form>
 				<button id="withdrawSingleButton" class="majorButton" onclick="withdrawSingleToken(this)">Withdraw Single Token</button>
 				<div id="singleWithdrawStatus" class="status">Single Token Withdrawal not initiated.</div>
