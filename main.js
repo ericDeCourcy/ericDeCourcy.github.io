@@ -192,6 +192,10 @@ function populateActionOptions() {
     + `<input type="number" id="swapAmountIn" name="swapAmountIn" oninput="calculateSwap(value)" min="0" value="0"/>`
     + activePool.getSelectTokenHTML('Token for swap input:', 'swapTokenIndexIn')
     + activePool.getSelectTokenHTML('Token for swap output:', 'swapTokenIndexOut');
+    const indexInElement = document.getElementById('swapTokenIndexIn');
+    indexInElement.addEventListener("change", displayUserBalance);
+    const indexOutElement = document.getElementById('swapTokenIndexOut');
+    indexOutElement.addEventListener("change", displayUserBalance);
 
   document.getElementById('singleWithdrawalForm').innerHTML =
     activePool.getSelectTokenHTML('Withdrawal Token:', 'singleTokenIndex')
@@ -320,8 +324,41 @@ async function calculateSwap(value) {
   } catch (error) {
     console.log(`Error retreiving swap estimate: ${error.code} ${error.message}`);
   }
+}
 
+async function displayUserBalance() {
+  const swapTokenIndexIn = document.getElementById('swapTokenIndexIn');
+  const userBalance = document.getElementById('userBalance');
+
+  let tokenIndexIn = swapTokenIndexIn.value;
+
+  let funcSig = '0x70a08231';
+
+  let balanceQueryTxData = funcSig 
+    + ''.padStart(24, '0') 
+    + ethereum.selectedAddress.slice(2,);
+
+
+  try {
+    let rawUserBalance = await ethereum.request({
+      method: 'eth_call',
+      params:   [{
+        to: activePool.poolTokens[tokenIndexIn].address,
+        data: balanceQueryTxData
+      }]
+    });
+    console.log(`Raw balance retrieved: ${rawUserBalance}.`);  //TODO add debug toggle
   
+    //format this to correct num of decimals
+    const tokenBalance = parseInt(rawUserBalance, 16) / activePool.poolTokens[tokenIndexIn].decimals;
+
+    // display it
+    userBalance.innerHTML = `Your current balance: ${tokenBalance} ${activePool.poolTokens[tokenIndexIn].name}`;
+  
+  } catch (error) {
+    console.log(`Error retreiving user balance: ${error.code} ${error.message}`);
+  }
+
 }
 
 async function withdrawBalanced(button) {
