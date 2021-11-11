@@ -1,5 +1,19 @@
-/* global tokens, fakePool, usd1Pool */
-const activePool = usd1Pool;
+/* global pools, getPoolOptionsHTML */
+let activePool = pools.USD1;
+
+function getPoolOptionsHTML() {
+  let optionsHTML = '';
+  Object.keys(pools).forEach((poolName) => {
+    let selected = (activePool === pools[poolName]) ? 'selected' : '';
+    optionsHTML += `<option value="${poolName}" ${selected}>${poolName} Pool</option>\n`;
+  });
+  return `<form id="poolForm">
+      <label for="selectPool">Current Pool: </label>
+      <select id="selectPool" name="selectPool" onchange="changeActivePool(value)">
+        ${optionsHTML}
+      </select>
+  </form>`;
+}
 
 // accounts (for metamask)
 let accounts = [];
@@ -35,7 +49,7 @@ function selectSection(sectionNumber) {
   actionSectionTitles[sectionNumber].classList.add('activeSection');
 
   if (sectionNumber === 2) { 
-    getLPBalance();
+    displayLPBalance();
   }
 
 }
@@ -62,7 +76,7 @@ function selectSubsection(subsectionNumber) {
   })
   withdrawalSubsectionTitles[subsectionNumber].classList.add('activeSection');
   if (subsectionNumber === 0) { 
-    getLPBalance();
+    displayLPBalance();
   }
 }
 
@@ -71,7 +85,10 @@ function getPaddedHex(input) {
   return input.toString(16).padStart(64, '0');
 }
 
-const tokenArrayLengthPadded = getPaddedHex(activePool.poolTokens.length);
+function getTokenArrayLengthPadded() {
+  return getPaddedHex(activePool.poolTokens.length);
+}
+
 const minAmountPadded = getPaddedHex('1');
 // TODO Eric - figure out what this is
 const txLengthMaybe = getPaddedHex('60');
@@ -150,9 +167,9 @@ async function showApprovalTab() {
 }
 
 //TODO alanna simplify this function
-async function approveToken(button, tokenId) {
+async function approveToken(button, tokenIndex) {
   button.disabled = true;
-  const token = tokens[tokenId];
+  const token = activePool.allTokens.filter((token) => token.index === tokenIndex)[0];
   const loggingKeyword = token.name + ' approval';
   const statusElement = document.getElementById(`approve${token.name}Status`);
   showAttempting(statusElement, loggingKeyword);
@@ -185,8 +202,16 @@ function showActionsTab() {
   populateActionOptions();
 }
 
+function changeActivePool(value) {
+  activePool = pools[value];
+  displayLPBalance();
+  displayUserBalance();
+  showApprovalTab();
+}
 
 function populateActionOptions() {
+  document.getElementById('poolOptions').innerHTML = getPoolOptionsHTML();
+
   document.getElementById('swapForm').innerHTML =
     `<label for="swapAmountIn">Tokens in for swap:</label>`
     + `<input type="number" id="swapAmountIn" name="swapAmountIn" oninput="calculateSwap(value)" min="0" value="0"/>`
@@ -221,7 +246,7 @@ async function deposit(button) {
     + txLengthMaybe
     + minAmountPadded
     + deadline62eb4611Padded
-    + tokenArrayLengthPadded
+    + getTokenArrayLengthPadded()
     + activePool.getTokenValuesFromElements('ToDeposit');
 
   //approves Fake USDC for transfer into the stableswap frontend
@@ -232,8 +257,11 @@ async function deposit(button) {
 }
 
 
-async function getLPBalance() {
-    console.log("Getting LP Balance...");
+async function displayLPBalance() {
+    const LPTokenBalanceElement = document.getElementById('LPTokenBalance');
+    const loadingString = 'Getting LP Balance...';
+    LPTokenBalanceElement.innerHTML = loadingString;
+    console.log(loadingString);
 
     // construct tx params
     let funcSig = '0x70a08231';
@@ -251,7 +279,7 @@ async function getLPBalance() {
     }); 
     
     const tokenBalanceString = `Your LP Token balance: ${parseInt(LPBalance, 16) / 1e+18}`;
-    document.getElementById('LPTokenBalance').innerHTML = tokenBalanceString;
+    LPTokenBalanceElement.innerHTML = tokenBalanceString;
     console.log(tokenBalanceString);
 }
 
@@ -378,7 +406,7 @@ async function withdrawBalanced(button) {
     + withdrawAmountHex
     + txLengthMaybe
     + deadline62eb4611Padded
-    + tokenArrayLengthPadded
+    + getTokenArrayLengthPadded()
     // min amount to receive X number of pool tokens
     + minAmountPadded.repeat(activePool.poolTokens.length);
 
@@ -423,7 +451,7 @@ async function withdrawImbalanced(button) {
     + txLengthMaybe
     + LPBalanceFormatted                      // max burn amount
     + deadline6ca33f73Padded
-    + tokenArrayLengthPadded
+    + getTokenArrayLengthPadded()
     + activePool.getTokenValuesFromElements('ImbalancedOut');
   const transactionParams = activePool.getTransactionParams(transactionData);
   
