@@ -4,54 +4,12 @@ class Pool {
         this.rewardsContractAddress = rewardsContractAddress;
         this.poolTokens = poolTokens;
         this.LPToken = LPToken;
-        this.allTokens = JSON.parse(JSON.stringify(this.poolTokens));
-        this.allTokens.push(this.LPToken);
+        // this list refers to the same underlying token objects but includes the rewards token
+        this.allTokens = this.poolTokens.concat(this.LPToken);
     }
 
-    async getTokenApprovalHTML() {
-        let buttonsHTML = '';
-        let allTokensAreApproved = true;
-
-        const tokenAllowanceTransactionData =
-            '0xdd62ed3e'
-            + ''.padStart(24, '0')
-            + ethereum.selectedAddress.slice(2,)
-            + ''.padStart(24, '0')
-            + activePool.address.replace(/^0x/, '');
-
-        for (const token of this.allTokens) {
-            let disabled = '';
-            let status = '';
-            try {
-                const allowance = await ethereum.request({
-                    method: 'eth_call',
-                    params: [{
-                        to: token.address,
-                        data: tokenAllowanceTransactionData
-                    }]
-                });
-                if (allowance != 0) {
-                    disabled = 'disabled';
-                    status = 'Token already approved.';
-                } else {
-                    allTokensAreApproved = false;
-                }
-            } catch(error) {
-                console.log(error);
-                allTokensAreApproved = false;
-            }
-            buttonsHTML += `<button id="approve${token.name}Button" 
-                onclick="approveToken(this, ${token.index})" ${disabled}>
-                    Approve ${token.name}
-                </button>
-                <span id="approve${token.name}Status" class="status">${status}</span>
-                <br/>`;
-        }
-        if (allTokensAreApproved) {
-            return null;
-        } else {
-            return buttonsHTML;
-        }
+    getTokenByIndex(index) {
+        return this.allTokens.filter((token) => Number(token.index) === Number(index))[0];
     }
 
     getSelectTokenHTML(labelText, elementName) {
@@ -67,18 +25,19 @@ class Pool {
             </select>`;
     }
 
-    getInputTokenAmountHTML(labelText, partialElementName) {
+    getInputTokenAmountHTML(labelText, partialElementName, oninput=null) {
         let inputHTML = '';
         this.poolTokens.forEach((token) => {
             const elementName = token.name + partialElementName;
             inputHTML += `<label for="${elementName}">${token.name} ${labelText}</label>
-                <input id="${elementName}" name="${elementName}" type="number" min="0" value="0" />`;
+                <input id="${elementName}" name="${elementName}" 
+                class="${partialElementName}" type="number" min="0" value="0" oninput="${oninput}"/>`;
         });
         return inputHTML;
     }
 
     getTokenValuesFromElements(partialElementName) {
-        // TODO alanna - l2code
+        // TODO alanna - refactor
         let tokenValues = '';
         activePool.poolTokens.forEach((token) => {
             const elementName = token.name + partialElementName;
@@ -114,6 +73,7 @@ class Token {
         this.name = name;
         this.address = address;
         this.decimals = decimals;
+        this.approved = false;
     }
 
     scaleAndPad(value) {

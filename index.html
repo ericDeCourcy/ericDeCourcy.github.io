@@ -8,6 +8,7 @@
 
 <body>
 	<noscript>You need to enable JavaScript to run this app.</noscript>
+	<div id="loadingOverlay" hidden=true></div>
 	
 	<div id="metamaskConnection" class="tab">
 		<h1>Connect With Metamask</h1>
@@ -20,22 +21,8 @@
 		<div id="transactionStatus" class="status">Metamask not connected.</div>
 	</div>
 
-	<div id="tokenApproval" class="tab" hidden>
-		<div class="back"><button class="back" onclick="showConnectionTab()">←</button></div>
-		<h1>Approvals</h1>
-		<div class="instructions">
-			Before using StableSwap, you'll need to approve any tokens you plan to transfer in.
-			<br/>These buttons will approve the maximum amount of each token.
-			<br/>Note that you will need to approve the LP token if you plan to withdraw, as this gives the swap contract the ability to burn your LP tokens.
-		</div>
-		<div id="tokenApprovalButtons">
-			<!--- token approval buttons dynamically generated -->
-		</div>
-		<button id="continueButton" class="majorButton" onclick="showActionsTab()">Skip / Continue</button>
-	</div>
-
 	<div id="actions" class="tab" hidden>
-		<div class="back"><button class="back" onclick="showApprovalTab()">←</button></div>
+		<div class="back"><button class="back" onclick="showConnectionTab()">←</button></div>
 		<div id="poolOptions"><!-- pool options dynamically generated--></div>
 		<div id="actionOptions">
 			<button id="depositTitle" class="sectionButton" onclick="selectSection(0)">Deposit</button>
@@ -43,12 +30,13 @@
 			<button id="withdrawTitle" class="sectionButton" onclick="selectSection(2)">Withdraw</button>
 			<button id="rewardsTitle" class="sectionButton" onclick="selectSection(3)">Rewards</button>
 		</div>
+
 		<div id="deposit" class="section" hidden>
 			<div class="instructions">
 				Input amounts and then click Deposit. Make sure your tokens are approved!
 			</div>
 			<form id="depositForm"><!-- pool token inputs dynamically generated --></form>
-			<button id="depositButton" class="majorButton" onclick="deposit(this)">Deposit</button>	
+			<div id="depositButtonWrapper"><button id="depositButton" class="majorButton">Deposit</button></div>
 			<div id="depositStatus" class="status">Deposit not initiated.</div>
 		</div>
 		
@@ -57,19 +45,19 @@
 				Pick what token to input and what token you'd like to recieve. Then, pick how many of the input token you'd like to send in.
 			</div>
 			<form id="swapForm"><!-- token options dynamically generated --></form>
-			<button id="swapButton" class="majorButton" onclick="swap(this)">Swap</button>
+			<div id="swapButtonWrapper"><button id="swapButton" class="majorButton">Swap</button></div>
 			<div id="userBalance" class="status"> <!-- balance --> </div>
 			<div id="swapEstimate" class="status">No swap estimate.</div>
 			<div id="swapStatus" class="status">Swap not initiated.</div>
 		</div>
 
 		<div id="withdraw" class="section" hidden>
-			<div id="swapOptions">
+			<div id="withdrawalOptions">
 				<button id="balancedWithdrawalTitle" class="subsectionButton activeSection" onclick="selectSubsection(0)">Balanced Withdrawal</button>
 				<button id="imbalancedWithdrawalTitle" class="subsectionButton" onclick="selectSubsection(1)">Imbalanced Withdrawal</button>
 				<button id="singleWithdrawalTitle" class="subsectionButton" onclick="selectSubsection(2)">Single Token Withdrawal</button>
 			</div>
-
+ 
 			<div id="balancedWithdrawal" class="subsection">
 				<div class="instructions">
 					This will burn LP tokens and send you tokens in equal proportions to what the pool has.
@@ -80,7 +68,7 @@
 					<label for="withdrawAmountInput">LP Tokens To Withdraw:</label>
 					<input type="number" id="withdrawAmountInput" name="withdrawAmountInput" min="0" value="0"/>
 				</form>
-				<button id="withdrawBalancedButton" class="majorButton" onclick="withdrawBalanced(this)">Withdraw Balanced</button>
+				<div id="withdrawBalancedButtonWrapper"><button id="withdrawBalancedButton" class="majorButton">Withdraw Balanced</button></div>
 				<div id="withdrawBalancedStatus" class="status">Balanced Withdrawal not initiated.</div>
 			</div>
 
@@ -90,7 +78,7 @@
 					<br/>Make sure your LP tokens are approved!
 				</div>
 				<form id="imbalancedWithdrawalForm"><!-- token options dynamically generated --></form>
-				<button id="withdrawImbalancedButton" class="majorButton" onclick="withdrawImbalanced(this)">Withdraw Imbalanced</button>
+				<div id="withdrawImbalancedButtonWrapper"><button id="withdrawImbalancedButton" class="majorButton">Withdraw Imbalanced</button></div>
 				<div id="withdrawImbalancedStatus" class="status">Imbalanced Withdrawal not initiated.</div>
 			</div>
 			
@@ -99,7 +87,7 @@
 					This will burn a specified amount of LP tokens and withdraw all funds in the form of a single token.
 				</div>
 				<form id="singleWithdrawalForm"><!-- token options dynamically generated --></form>
-				<button id="withdrawSingleButton" class="majorButton" onclick="withdrawSingleToken(this)">Withdraw Single Token</button>
+				<div id="withdrawSingleButtonWrapper"><button id="withdrawSingleButton" class="majorButton">Withdraw Single Token</button></div>
 				<div id="singleWithdrawStatus" class="status">Single Token Withdrawal not initiated.</div>
 			</div>
 		</div>
