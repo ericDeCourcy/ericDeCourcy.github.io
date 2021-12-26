@@ -119,7 +119,11 @@ function showSuccess(statusElement, loggingKeyword) {
 }
 
 function showError(statusElement, loggingKeyword, error) {
-  console.error(`${loggingKeyword} failed: ${error.code} ${error.message}`);
+  if (typeof error.code !== 'undefined') {
+    console.error(`${loggingKeyword} failed: ${error.code} ${error.message}`);
+  } else {
+    console.error(`${loggingKeyword} failed: ${error.message}`);
+  }
   statusElement.innerHTML = `${loggingKeyword} failed. See console log for details.`;
 }
 
@@ -187,46 +191,51 @@ async function connectToMetamask(button) {
   showAttempting(statusElement, loggingKeyword);
 
   try {
+    // ensure the user has Metamask and connect to it
     if (!ethereum) {
       throw new ReferenceError('Could not access Metamask browser extension.');
     }
     accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+
+    // try to switch to the Fuse chain
+    try {
+      showAttempting(statusElement, 'switch to Fuse chain');
+      await ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x7a' }],
+      });
+    } catch (switchError) {
+      // if we couldn't switch because it doesn't exist, try to add it
+      if (switchError.code === 4902) {
+        console.log(`Fuse chain was not found on your Metamask extension.`);
+        showAttempting(statusElement, 'add Fuse chain to Metamask');
+        try {
+          await ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: '0x7a',
+              chainName: 'Fuse',
+              nativeCurrency: {
+                name: 'Fuse',
+                symbol: 'FUSE',
+                decimals: 18,
+              },
+              rpcUrls: ['https://rpc.fuse.io']
+            }],
+          });
+        } catch (addError) {
+          throw new ReferenceError('Failed to add Fuse chain to Metamask.');
+        }
+      } else { // if we couldn't switch for another reason, just fail out
+        throw new ReferenceError('Failed to switch Metamask to Fuse chain.');
+      }
+    }
     showSuccess(statusElement, loggingKeyword);
-    //TODO alanna this shouldn't happen until complete success
     await showActionsTab();
   } catch (error) {
     showError(statusElement, loggingKeyword, error);
   } finally {
     button.disabled = false;
-  }
-
-  try {
-    await ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: 
-        [{chainId: '0x7a'  }],
-    });
-  } catch (switchError) {
-    showError(statusElement, 'Chain ID Switch');
-
-    if (switchError.code === 4902) {
-      try {
-        await ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [{chainId: '0x7a', 
-                    chainName: 'Fuse',
-                    nativeCurrency: {
-                      name: 'Fuse',
-                      symbol: 'FUSE',
-                      decimals: 18,
-                    },
-                    rpcUrl: 'https://rpc.fuse.io'
-                  }],
-        });
-      } catch (addError) {
-        // TODO: alannnnaaaaaa
-      }
-    }
   }
 }
 
