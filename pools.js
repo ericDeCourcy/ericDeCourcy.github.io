@@ -118,7 +118,7 @@ const usd2Pool = new Pool(
 );
 
 const usd3Pool = new Pool(
-    '0x84AD82Da3b2d066e9C0Ce86DdD643090d9276251', //swap
+    '0xc98f8bf953647aC364F43D61E5132867c787653F', //swap
     '0x8dfc1bf6cf195f1ac3d8fe8f2c9158d60bd0c129', //rewards
     [
         new Token(0, 'fUSD', '0x249BE57637D8B013Ad64785404b24aeBaE9B098B', 1e+18),
