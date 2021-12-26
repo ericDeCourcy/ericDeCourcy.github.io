@@ -220,7 +220,8 @@ async function connectToMetamask(button) {
                 symbol: 'FUSE',
                 decimals: 18,
               },
-              rpcUrls: ['https://rpc.fuse.io']
+              rpcUrls: ['https://rpc.fuse.io'],
+              blockExplorerUrls: ['https://explorer.fuse.io/']
             }],
           });
         } catch (addError) {
