@@ -192,11 +192,41 @@ async function connectToMetamask(button) {
     }
     accounts = await ethereum.request({ method: 'eth_requestAccounts' });
     showSuccess(statusElement, loggingKeyword);
+    //TODO alanna this shouldn't happen until complete success
     await showActionsTab();
   } catch (error) {
     showError(statusElement, loggingKeyword, error);
   } finally {
     button.disabled = false;
+  }
+
+  try {
+    await ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: 
+        [{chainId: '0x7a'  }],
+    });
+  } catch (switchError) {
+    showError(statusElement, 'Chain ID Switch');
+
+    if (switchError.code === 4902) {
+      try {
+        await ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{chainId: '0x7a', 
+                    chainName: 'Fuse',
+                    nativeCurrency: {
+                      name: 'Fuse',
+                      symbol: 'FUSE',
+                      decimals: 18,
+                    },
+                    rpcUrl: 'https://rpc.fuse.io'
+                  }],
+        });
+      } catch (addError) {
+        // TODO: alannnnaaaaaa
+      }
+    }
   }
 }
 
@@ -310,8 +340,8 @@ function populateActionOptions() {
   document.getElementById('swapForm').innerHTML =
     `<label for="swapAmountIn">Tokens in for swap:</label>`
     + `<input type="number" id="swapAmountIn" name="swapAmountIn" oninput="calculateSwap(value)" min="0" value="0"/>`
-    + activePool.getSelectTokenHTML('Token for swap input:', 'swapTokenIndexIn')
-    + activePool.getSelectTokenHTML('Token for swap output:', 'swapTokenIndexOut');
+    + activePool.getSelectTokenHTML('Token you will send in:', 'swapTokenIndexIn')
+    + activePool.getSelectTokenHTML('Token you will receive:', 'swapTokenIndexOut');
 
     const indexInElement = document.getElementById('swapTokenIndexIn');
     indexInElement.addEventListener('change', displayUserBalance);

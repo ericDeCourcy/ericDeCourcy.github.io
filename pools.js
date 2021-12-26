@@ -117,8 +117,21 @@ const usd2Pool = new Pool(
     new Token(3, 'USD2-LP', '0x6A5Ea3652b88a9d066094216ACa18aC58eA216f5', 1e+18)
 );
 
+const usd3Pool = new Pool(
+    '0x84AD82Da3b2d066e9C0Ce86DdD643090d9276251', //swap
+    '0x8dfc1bf6cf195f1ac3d8fe8f2c9158d60bd0c129', //rewards
+    [
+        new Token(0, 'fUSD', '0x249BE57637D8B013Ad64785404b24aeBaE9B098B', 1e+18),
+        new Token(1, 'oneFUSE', '0x8A5eE71Cd4Db6b7ffdCE37313006e48FaD6ADdB0', 1e+18),
+        new Token(2, 'BUSD', '0x6a5F6A8121592BeCd6747a38d67451B310F7f156', 1e+18),
+        new Token(3, 'USDT', '0xFaDbBF8Ce7D5b7041bE672561bbA99f79c532e10', 1e+6)
+    ],
+    new Token(4, 'USD3-LP', '0xAfCb09e53B2cdb82440Da1A83DcA3dC16d512EFe', 1e+18)
+);
+
 const pools = {
     // Fake: fakePool, //removed for production
     USD1: usd1Pool,
-    USD2: usd2Pool
+    USD2: usd2Pool,
+    USD3: usd3Pool
 };

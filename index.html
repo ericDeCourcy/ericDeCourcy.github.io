@@ -14,7 +14,6 @@
 		<h1>Connect With Metamask</h1>
 		<div class="instructions">
 			First things first, connect to MetaMask! If you don't have metamask, download it from metamask.io
-			<br/>If you're connected, you'll see a message below the button indicating this.
 		</div>
 		<br/>
 		<button id="enableEthereumButton" class="majorButton" onclick="connectToMetamask(this)">Connect To MetaMask</button>
@@ -33,7 +32,7 @@
 
 		<div id="deposit" class="section" hidden>
 			<div class="instructions">
-				Input amounts and then click Deposit. Make sure your tokens are approved!
+				Deposit tokens into the pool and recieve pool LP tokens
 			</div>
 			<form id="depositForm"><!-- pool token inputs dynamically generated --></form>
 			<div id="depositButtonWrapper"><button id="depositButton" class="majorButton">Deposit</button></div>
@@ -42,7 +41,6 @@
 		
 		<div id="swap" class="section">
 			<div class="instructions">
-				Pick what token to input and what token you'd like to recieve. Then, pick how many of the input token you'd like to send in.
 			</div>
 			<form id="swapForm"><!-- token options dynamically generated --></form>
 			<div id="swapButtonWrapper"><button id="swapButton" class="majorButton">Swap</button></div>
@@ -60,8 +58,7 @@
  
 			<div id="balancedWithdrawal" class="subsection">
 				<div class="instructions">
-					This will burn LP tokens and send you tokens in equal proportions to what the pool has.
-					<br/>Make sure your LP tokens are approved!
+					You will recieve tokens in equal proportions to what the pool has.
 				</div>
 				<span id="LPTokenBalance">Retreiving LP Token balance...</span>
 				<form>
@@ -74,8 +71,7 @@
 
 			<div id="imbalancedWithdrawal" class="subsection" hidden>
 				<div class="instructions">
-					This will give the "desired" amounts of each tokens, burning the appropriate number of LP tokens. Keep in mind that this may burn up to all of your LP tokens.
-					<br/>Make sure your LP tokens are approved!
+					You can specify however many tokens you'd like to receive.
 				</div>
 				<form id="imbalancedWithdrawalForm"><!-- token options dynamically generated --></form>
 				<div id="withdrawImbalancedButtonWrapper"><button id="withdrawImbalancedButton" class="majorButton">Withdraw Imbalanced</button></div>
