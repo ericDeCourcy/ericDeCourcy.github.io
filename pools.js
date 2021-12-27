@@ -132,6 +132,6 @@ const usd3Pool = new Pool(
 const pools = {
     // Fake: fakePool, //removed for production
     USD1: usd1Pool,
-    USD2: usd2Pool,
+    //USD2: usd2Pool, // USD2 pool has been paused
     USD3: usd3Pool
 };
