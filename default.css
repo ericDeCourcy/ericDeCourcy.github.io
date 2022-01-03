@@ -27,6 +27,11 @@ div.tab {
     position: relative;
 }
 
+div#helpLink {
+    margin: 30px;
+    text-align: center;
+}
+
 h1, h2, h3 {
     font-weight: 400;
 }
@@ -162,4 +167,14 @@ button.majorButton:hover {
 button.majorButton:disabled {
     background-image: linear-gradient(137.27deg, rgb(177, 255, 191, .5) 3.65%, rgb(255, 241, 109, .5) 100%);
     color: #000000;
+}
+
+a:visited {
+    color: rgb(255, 241, 109);
+}
+
+a:link, 
+a:hover, 
+a:active {
+    color: rgb(177, 255, 191);
 }

@@ -349,16 +349,18 @@ function populateActionOptions() {
 
   document.getElementById('swapForm').innerHTML =
     `<label for="swapAmountIn">Tokens in for swap:</label>`
-    + `<input type="number" id="swapAmountIn" name="swapAmountIn" oninput="calculateSwap(value)" min="0" value="0"/>`
-    + activePool.getSelectTokenHTML('Token you will send in:', 'swapTokenIndexIn')
+    + `<input type="number" id="swapAmountIn" name="swapAmountIn" oninput="calculateSwap()" min="0" value="0"/>`
+    + activePool.getSelectTokenHTML('Token you will send in:', 'swapTokenIndexIn', true)
     + activePool.getSelectTokenHTML('Token you will receive:', 'swapTokenIndexOut');
+    updateSwapOutOptions();
 
-    const indexInElement = document.getElementById('swapTokenIndexIn');
-    indexInElement.addEventListener('change', displayUserBalance);
-    indexInElement.addEventListener('change', updateSwapButton);
-
-    const indexOutElement = document.getElementById('swapTokenIndexOut');
-    indexOutElement.addEventListener('change', displayUserBalance);
+  const indexOutElement = document.getElementById('swapTokenIndexOut');
+  const indexInElement = document.getElementById('swapTokenIndexIn');
+  indexInElement.addEventListener('change', updateSwapButton);
+  [indexInElement, indexOutElement].forEach((element) => {
+    element.addEventListener('change', displayUserBalance);
+    element.addEventListener('change', calculateSwap);
+  });
 
   document.getElementById('singleWithdrawalForm').innerHTML =
     activePool.getSelectTokenHTML('Withdrawal Token:', 'singleTokenIndex')
@@ -395,9 +397,6 @@ function updateDepositButton() {
     const elementValue = Number(document.getElementById(elementName).value);
 
     if (elementValue > 0 && token.approved === false) {
-
-      console.log(token);
-      console.log(elementValue);
       newButtonElement = getNewMajorButton('depositButton', `Approve ${token.name}`,
         (() => approveToken(newButtonElement, token.index, document.getElementById('depositStatus')))
       );
@@ -458,7 +457,6 @@ async function displayUserBalance() {
     //format this to correct num of decimals
     const tokenBalance = parseInt(rawUserBalance, 16) / activePool.poolTokens[tokenIndexIn].decimals;
 
-    // display it
     userBalance.innerHTML = `Your current balance: ${tokenBalance} ${activePool.poolTokens[tokenIndexIn].name}`;
   
   } catch (error) {
@@ -540,16 +538,37 @@ async function swap(button) {
   button.disabled = false;
 }
 
-async function calculateSwap(value) {
-  const swapTokenIndexIn = document.getElementById('swapTokenIndexIn');
-  const swapTokenIndexOut = document.getElementById('swapTokenIndexOut');
+function updateSwapOutOptions() {
+  const tokenIndexIn = document.getElementById('swapTokenIndexIn');
+  const tokenIndexOut = document.getElementById('swapTokenIndexOut');
+
+  const inVal = tokenIndexIn.value;
+  const outVal = tokenIndexOut.value;
+
+  for (const option of tokenIndexOut.options) {
+    option.selected = false;
+    option.disabled = (option.value == inVal) ? true : false;
+  }
+
+  if (inVal != outVal) {
+    tokenIndexOut.options[outVal].selected = true;
+  } else {
+    if (inVal == 0) {
+      tokenIndexOut.options[1].selected = true;
+    } else {
+      tokenIndexOut.options[0].selected = true;
+    }
+  }
+}
+
+async function calculateSwap() {
+  const swapValueIn = document.getElementById('swapAmountIn').value;
+  const tokenIndexIn = document.getElementById('swapTokenIndexIn').value;
+  const tokenIndexOut = document.getElementById('swapTokenIndexOut').value;
   const swapEstimateElement = document.getElementById('swapEstimate');
   swapEstimateElement.innerHTML = `Estimating swap outcome...`;
 
-  let tokenIndexIn = swapTokenIndexIn.value;
-  let tokenIndexOut = swapTokenIndexOut.value;
-
-  let swapAmountScaled = value * activePool.poolTokens[tokenIndexIn].decimals;
+  let swapAmountScaled = swapValueIn * activePool.poolTokens[tokenIndexIn].decimals;
   
   const transactionData = 
     '0xa95b089f'    // calculate swap sighash
@@ -557,7 +576,6 @@ async function calculateSwap(value) {
     + getPaddedHex(tokenIndexOut) 
     + getPaddedHex(swapAmountScaled);
 
-  console.log("got to before the try in calc swap");
   console.log("transactionData = " + transactionData);
 
   try {

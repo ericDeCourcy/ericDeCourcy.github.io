@@ -12,7 +12,7 @@ class Pool {
         return this.allTokens.filter((token) => Number(token.index) === Number(index))[0];
     }
 
-    getSelectTokenHTML(labelText, elementName) {
+    getSelectTokenHTML(labelText, elementName, triggersSwapOutUpdate=false) {
         let optionsHTML = '';
         this.poolTokens.forEach((token) => {
             optionsHTML += `<option value=${token.index}>
@@ -20,7 +20,8 @@ class Pool {
                 </option>`;
         });
         return `<label for="${elementName}">${labelText}</label>
-            <select id="${elementName}" name="${elementName}">
+            <select id="${elementName}" name="${elementName}" 
+            ${triggersSwapOutUpdate ? 'onchange="updateSwapOutOptions()"' : ''}>
                 ${optionsHTML}
             </select>`;
     }
