@@ -749,7 +749,7 @@ async function claimRewards(button) {
   statusElement = document.getElementById('getRewardsStatus');
   showAttempting(statusElement, loggingKeyword);
 
-  const rewardClaimMessageData = '0xc00007b00000000000000000000000001d7216e115f8884016004e3f390d824f0cec4afc';
+  const rewardClaimMessageData = '0xc00007b00000000000000000000000000BE9e53fd7EDaC9F859882AfdDa116645287C629';
   const transactionParams = activePool.getRewardsTransactionParams(rewardClaimMessageData);
 
   ethRequest(transactionParams, statusElement, loggingKeyword);
